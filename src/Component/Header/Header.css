@@ -1,0 +1,13 @@
+.header{
+    display: flex;
+    flex-direction:row ;
+    justify-content: space-between;
+    background-color: aquamarine;
+    color: white;
+
+}
+.header-nav li{
+    display: inline-block;
+    padding: 15px 25px;
+ 
+}

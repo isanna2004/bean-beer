@@ -1,0 +1,23 @@
+.wrapper {
+  height: 250px;
+
+  border: 1px solid lightgrey;
+  box-shadow: 0 0 0.5px 1px rgba(0, 0, 0, 0.2);
+  border-radius: 5px;
+  padding: 40px;
+  
+}
+.beer-img {
+  height: 100px;
+}
+.btn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+}
+.description {
+    height: 150px;
+  overflow: hidden;
+
+   text-overflow: ellipsis;
+}
