@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Route, Switch, Link } from "react-router-dom";
 import Home from "../Home/Home";
 import "./Header.css";
 import Favourites from "../Favourites/Favourites";
-
+import App from "../App/App"
 class Header extends React.Component {
   render() {
     return (
@@ -22,7 +22,7 @@ class Header extends React.Component {
               </ul>
             </nav>
             <Switch>
-              <Route exact path="/" component={Home} />
+              <Route exact path="/App" component={App} />
               <Route exact path="/favourites" component={Favourites} />
             </Switch>
           </Router>
