@@ -8,6 +8,7 @@ class Beer extends React.Component {
     this.state = {
       items: [],
       value: "",
+      filter: [],
     };
   }
 
@@ -21,21 +22,21 @@ class Beer extends React.Component {
       });
   }
   handleSubmit = (event) => {
+    const { filter } = this.state;
     event.preventDefault();
+    this.setState({
+      items: filter
+    })
   };
   dataSearch = (e) => {
+    
     const { items } = this.state;
     const value = e.target.value.toLowerCase();
     this.setState({
       value: value,
     });
-    let filter = items.filter(function (item) {
-      return item.name.toLowerCase() === value;
-    });
-    console.log(filter);
-    this.setState({
-      items: filter,
-    });
+    let filter = items.filter((item) => item.name.toLowerCase().includes( value));
+    this.setState({ filter: filter })
   };
 
   render() {
