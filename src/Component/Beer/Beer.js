@@ -17,7 +17,8 @@ class Beer extends React.Component {
       .then((data) => data.json())
       .then((data) => {
         this.setState({
-          items: data,
+          data: data,
+          items:data
         });
       });
   }
@@ -29,12 +30,18 @@ class Beer extends React.Component {
     })
   };
   dataSearch = (e) => {
-    
-    const { items } = this.state;
-    const value = e.target.value.toLowerCase();
+    const { items,data } = this.state;
+    let value = e.target.value.toLowerCase();
     this.setState({
-      value: value,
+      value: value
     });
+ value.length === 0
+   ? this.setState({
+       items: data,
+     })
+   : (value = e.target.value.toLowerCase());
+    
+    
     let filter = items.filter((item) => item.name.toLowerCase().includes( value));
     this.setState({ filter: filter })
   };
