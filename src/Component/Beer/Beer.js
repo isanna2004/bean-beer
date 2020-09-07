@@ -1,7 +1,9 @@
 import React from "react";
 import "./Beer.css";
-import StarBorderIcon from "@material-ui/icons/StarBorder";
-
+import StarIcon from "@material-ui/icons/Star";
+import StarRateTwoToneIcon from "@material-ui/icons/StarRateTwoTone";
+import StarOutlinedIcon from "@material-ui/icons/StarOutlined";
+import { yellow } from "@material-ui/core/colors";
 class Beer extends React.Component {
   constructor() {
     super();
@@ -9,43 +11,57 @@ class Beer extends React.Component {
       items: [],
       value: "",
       filter: [],
+      isToggleOn: false,
+      favourites: [],
     };
   }
-
+  //получаем данные с api
   componentDidMount() {
     fetch("https://api.punkapi.com/v2/beers?brewed_before=11-2012&abv_gt=6")
       .then((data) => data.json())
       .then((data) => {
         this.setState({
           data: data,
-          items:data
+          items: data,
         });
       });
   }
+  //подтверждаем введенный запрос
   handleSubmit = (event) => {
     const { filter } = this.state;
     event.preventDefault();
+    // передаем в state найденные элементы
     this.setState({
-      items: filter
-    })
+      items: filter,
+    });
   };
+  //получаем значение при вводе запроса в поле ввода
   dataSearch = (e) => {
-    const { items,data } = this.state;
+    const { items, data } = this.state;
     let value = e.target.value.toLowerCase();
     this.setState({
-      value: value
+      value: value,
     });
- value.length === 0
-   ? this.setState({
-       items: data,
-     })
-   : (value = e.target.value.toLowerCase());
-    
-    
-    let filter = items.filter((item) => item.name.toLowerCase().includes( value));
-    this.setState({ filter: filter })
+    value.length === 0
+      ? this.setState({
+          items: data,
+        })
+      : (value = e.target.value.toLowerCase());
+    // отфильтровываем данные,содержащие значение из поля ввода
+    let filter = items.filter((item) =>
+      item.name.toLowerCase().includes(value)
+    );
+    this.setState({ filter: filter });
   };
-
+  addFavourite = (e) => {
+    let favourite = e.target;
+    favourite.classList.toggle("favourite");
+    if (favourite.classList.contains("favourite")) {
+      this.setState({
+        isToggleOn: true,
+      });
+    }
+  };
   render() {
     return (
       <div className="container">
@@ -76,6 +92,14 @@ class Beer extends React.Component {
             <div className="col-md-4" key={item.id}>
               <div className="wrapper my-3">
                 <div className="row">
+                  <StarOutlinedIcon
+                    style={{
+                      stroke: "aquamarine",
+                      strokeWidth: "2",
+                      fill: "white",
+                    }}
+                    onClick={this.addFavourite}
+                  />
                   <div className="col-3">
                     <img
                       className="beer-img"
@@ -86,11 +110,6 @@ class Beer extends React.Component {
                   <div className="col-7">
                     <h5>{item.name}</h5>{" "}
                     <p className="description">{item.description}</p>
-                  </div>
-                  <div className="col-1">
-                    <button className="btn">
-                      <StarBorderIcon style={{ color: "aquamarine" }} />
-                    </button>
                   </div>
                 </div>
               </div>

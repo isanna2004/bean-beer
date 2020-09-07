@@ -6,6 +6,7 @@
   padding: 20px;
   overflow: hidden;
   text-overflow: ellipsis;
+ 
 }
 
 .beer-img {
@@ -25,4 +26,10 @@
 }
 .search-input{
     width: 60%
+}
+.MuiSvgIcon-root{position:absolute;
+right: 40px;
+top: 40px;}
+.favourite{
+  fill:yellow
 }
