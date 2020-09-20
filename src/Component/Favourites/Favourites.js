@@ -2,24 +2,61 @@ import React from "react";
 import "./Favourites.css";
 
 class Favourites extends React.Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
     this.state = {
-      items: [],
+      data: [],
       favourites: [],
     };
   }
-  componentDidMount=()=> {
-    const { favourites} = this.props;
-
-    [favourites].forEach((item) => {
-    let id = item.toString()
-    fetch("https://api.punkapi.com/v2/beers/{id}");
+  componentDidMount() {
+    let favourites = this.props.favourites;
+    this.setState({
+      favourites: favourites,
     });
+     fetch(
+      "https://api.punkapi.com/v2/beers/?" +
+        new URLSearchParams({ ids: this.state.favourites.join("|") })
+    )
+      .then((res) => res.json())
+      .then((res) =>
+        this.setState({
+          data: res,
+        })
+      );
   }
 
   render() {
-    
+    const{data} = this.state;
+   
+    return (
+
+      <div>
+        <div className="container">
+          <div className="row">
+            {data.map((item) => (
+              <div className="col-md-4 my-3" key={item.id}>
+                <div className="wrapper">
+                  <div className="row">
+                    <div className="col-3">
+                      <img
+                        className="beer-img"
+                        src={item.image_url}
+                        alt="beer bottle"
+                      ></img>
+                    </div>
+                    <div className="col-7">
+                      <h5>{item.name}</h5>{" "}
+                      <p className="description">{item.description}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
   }
 }
 export default Favourites;

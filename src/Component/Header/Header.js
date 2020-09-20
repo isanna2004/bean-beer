@@ -1,10 +1,11 @@
 import React from "react";
 import { BrowserRouter as Router, Route, Switch, Link } from "react-router-dom";
-import Home from "../Home/Home";
+
 import "./Header.css";
 import Favourites from "../Favourites/Favourites";
 import App from "../App/App"
 class Header extends React.Component {
+  
   render() {
     return (
       <div className="header">
@@ -23,7 +24,7 @@ class Header extends React.Component {
             </nav>
             <Switch>
               <Route exact path="/App" component={App} />
-              <Route exact path="/favourites" component={Favourites} />
+              <Route exact path="/" component={Favourites} />
             </Switch>
           </Router>
         </div>

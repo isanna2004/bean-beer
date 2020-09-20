@@ -54,14 +54,13 @@ class App extends React.Component {
     this.setState({ filter: filter });
   };
   addFavourite = (id) => {
-    const { favourites, isToggleOn } = this.state;
+    const { favourites} = this.state;
     favourites.push(id);
     this.setState({
       favourites: favourites,
       isToggleOn: true,
     });
 
-    console.log(this.state.favourites);
   };
   removeFavourite = (id) => {
     const { favourites } = this.state;
@@ -74,11 +73,11 @@ class App extends React.Component {
   };
   render() {
     const { favourites, items } = this.state;
-    
+ 
     return (
       <div>
         <Header />
-        <Favourites items={items} favourites={favourites} />
+        <Favourites favourites={favourites} />
         <div className="container">
           <div className="row">
             <div className="col-12">
@@ -103,7 +102,7 @@ class App extends React.Component {
                 </form>
               </div>
             </div>
-            {this.state.items.map((item) => (
+            {items.map((item) => (
               <div className="col-md-4 my-3" key={item.id}>
                 <div className="wrapper">
                   <div className="row">
@@ -142,7 +141,6 @@ class App extends React.Component {
               </div>
             ))}
           </div>
-          
         </div>
       </div>
     );
