@@ -10,40 +10,42 @@ class Header extends React.Component {
     this.state = {
       isShown: false,
       favourites: [],
+      result:[]
     };
   }
-  componentDidMount() {
-    let fav = this.props.favourites;
-    this.setState({
-      favourites: fav,
-    });
+  static getDerivedStateFromProps(props, state) {
+    return {
+      favourites: props.favourites,
+    };
   }
+
   submitFavourites = () => {
     const { isShown, favourites } = this.state;
-   
     fetch(` https://api.punkapi.com/v2/beers/?ids=${favourites.join("|")}`)
       .then((res) => res.json())
-      .then((result) =>
+      .then((result) => {
         this.setState({
           isShown: true,
-          favourites: result,
-        })
-      ); 
-    
+          result: result,
+        });
+      });
   };
   removeFavourite = (id) => {
-    const { favourites } = this.state;
+    const {result } = this.state;
 
-  for(const key of favourites){
-if ( key.id === id){ favourites.splice(key,1)}
-this.setState({
-  favourites:favourites
-})
-  }
-  }
-  
+    for (const key of result) {
+      if (key.id === id) {
+        result.splice(key, 1);
+      }
+      this.setState({
+        result: result,
+      });
+    }
+  };
+
   render() {
-    const { favourites } = this.state;
+    const { result } = this.state;
+
     return (
       <div>
         <div className="header">
@@ -76,8 +78,8 @@ this.setState({
           style={{ display: this.state.isShown === true ? "block" : "none" }}
         >
           <div className="row">
-            {favourites.map((item) => (
-              <div className="col-md-4 my-3" key={item}>
+            {result.map((item) => (
+              <div className="col-md-4 my-3" key={item.name}>
                 <div className="wrapper">
                   <div className="row">
                     <StarOutlinedIcon

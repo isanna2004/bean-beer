@@ -2,6 +2,7 @@ import React from "react";
 import Header from "../Header/Header";
 import StarOutlinedIcon from "@material-ui/icons/StarOutlined";
 import "./App.css";
+import Favourites from "../Favourites/Favourites";
 
 
 class App extends React.Component {
@@ -76,8 +77,8 @@ class App extends React.Component {
  
     return (
       <div>
-        <Header  favourites={favourites}/>
-
+        <Header favourites={favourites} />
+        <Favourites favourites={favourites} />
         <div className="container">
           <div className="row">
             <div className="col-12">
@@ -104,7 +105,7 @@ class App extends React.Component {
             </div>
             {items.map((item) => (
               <div className="col-md-4 my-3" key={item.id}>
-                <div className="wrapper" >
+                <div className="wrapper">
                   <div className="row">
                     {favourites.indexOf(item.id) === -1 ? (
                       <StarOutlinedIcon
