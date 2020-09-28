@@ -1,95 +1,115 @@
 import React from "react";
 import Header from "../Header/Header";
-import StarOutlinedIcon from "@material-ui/icons/StarOutlined";
+import { Switch } from "react-router-dom";
 import "./App.css";
+import BeerItem from "../BeerItem/BeerItem";
 import Favourites from "../Favourites/Favourites";
-
+import { Api } from "../../Api/Api";
+import { Route } from "react-router-dom/cjs/react-router-dom.min";
+const api = new Api();
 
 class App extends React.Component {
-  constructor() {
-    super();
-    this.state = {
-      items: [],
-      value: "",
-      filter: [],
-      isToggleOn: false,
-      favourites: [],
-    };
-  }
-  //получаем данные с api
+  /**
+   * State
+   */
+  state = {
+    loading: false,
+    beersList: [],
+    search: "",
+    searchedBeersList: [],
+    favourites: [],
+  };
+
+  /**
+   * Hooks
+   */
+
   componentDidMount() {
-    fetch("https://api.punkapi.com/v2/beers?brewed_before=11-2012&abv_gt=6")
-      .then((data) => data.json())
+    //получаем данные с api
+    this.setState({ loading: true });
+    api.getBeersList().then((data) =>
+      this.setState({
+        beersList: data,
+        loading: false,
+      })
+    );
+  }
+  /**
+   * Methods
+   */
+  handleSearch = (e) => {
+    e.preventDefault();
+    this.setState({ loading: true });
+    api
+      .getBeersList({
+        beer_name: this.state.search.toLowerCase().replace(" ", "_"),
+      })
       .then((data) => {
         this.setState({
-          data: data,
-          items: data,
+          searchedBeersList: data,
+          loading: false,
         });
       });
-  }
-  //подтверждаем введенный запрос
-  handleSubmit = (event) => {
-    const { filter } = this.state;
-    event.preventDefault();
-    // передаем в state найденные элементы
-    this.setState({
-      items: filter,
-    });
   };
-  //получаем значение при вводе запроса в поле ввода
-  dataSearch = (e) => {
-    const { items, data } = this.state;
-    let value = e.target.value.toLowerCase();
-    this.setState({
-      value: value,
-    });
-    value.length === 0
-      ? this.setState({
-          items: data,
-        })
-      : (value = e.target.value.toLowerCase());
-    // отфильтровываем данные,содержащие значение из поля ввода
-    let filter = items.filter((item) =>
-      item.name.toLowerCase().includes(value)
-    );
-    this.setState({ filter: filter });
-  };
-  addFavourite = (id) => {
-    const { favourites} = this.state;
-    favourites.push(id);
-    this.setState({
-      favourites: favourites,
-      isToggleOn: true,
+  toggleFavourite = (id) => {
+    this.setState((state) => {
+      const idx = state.favourites.indexOf(id);
+      return {
+        favourites:
+          idx === -1
+            ? [...state.favourites, id]
+            : [
+                ...state.favourites.slice(0, idx),
+                ...state.favourites.slice(idx + 1),
+              ],
+      };
     });
 
   };
-  removeFavourite = (id) => {
-    const { favourites } = this.state;
-    if (favourites.includes(id)) {
-      favourites.splice(favourites.indexOf(id), 1);
-      this.setState({
-        isToggleOn: false,
-      });
-    }
-  };
+
+  /**
+   * Render
+   */
+
   render() {
-    const { favourites, items } = this.state;
- 
+    const {
+      favourites,
+      beersList,
+      searchedBeersList,
+      loading,
+      search,
+    } = this.state;
+    const beers = searchedBeersList.length ? searchedBeersList : beersList;
     return (
       <div>
         <Header favourites={favourites} />
-        <Favourites favourites={favourites} />
+
         <div className="container">
-          <div className="row">
-            <div className="col-12">
+          {/**
+           * Search form
+           */}
+
+          {/**
+           * Beers List
+           */}
+          <Switch>
+            <Route path="/" exact>
               <div className="search">
-                <form onSubmit={this.handleSubmit}>
+                <form onSubmit={this.handleSearch}>
                   <input
-                    value={this.state.value}
+                    value={search}
                     className="search-input"
                     type="text"
                     placeholder="Search for beer..."
-                    onChange={this.dataSearch}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      this.setState((state) => ({
+                        search: val,
+                        searchedBeersList: !val.trim()
+                          ? []
+                          : state.searchedBeersList,
+                      }));
+                    }}
                   />
                   <input
                     type="submit"
@@ -102,46 +122,28 @@ class App extends React.Component {
                   />
                 </form>
               </div>
-            </div>
-            {items.map((item) => (
-              <div className="col-md-4 my-3" key={item.id}>
-                <div className="wrapper">
-                  <div className="row">
-                    {favourites.indexOf(item.id) === -1 ? (
-                      <StarOutlinedIcon
-                        onClick={() => this.addFavourite(item.id)}
-                        style={{
-                          stroke: "aquamarine",
-                          strokeWidth: "2",
-                          fill: "white",
-                        }}
-                      />
-                    ) : (
-                      <StarOutlinedIcon
-                        onClick={() => this.removeFavourite(item.id)}
-                        style={{
-                          stroke: "aquamarine",
-                          strokeWidth: "2",
-                          fill: "yellow",
-                        }}
-                      />
-                    )}
-                    <div className="col-3">
-                      <img
-                        className="beer-img"
-                        src={item.image_url}
-                        alt="beer bottle"
-                      ></img>
-                    </div>
-                    <div className="col-7">
-                      <h5>{item.name}</h5>{" "}
-                      <p className="description">{item.description}</p>
-                    </div>
-                  </div>
+              {loading ? (
+                <p>is Loading</p>
+              ) : (
+                <div className="row">
+                  {beers.map((beerData) => (
+                    <BeerItem
+                      key={beerData.id}
+                      beerData={beerData}
+                      isFavourite={favourites.indexOf(beerData.id) !== -1}
+                      toggleFavourite={this.toggleFavourite}
+                    />
+                  ))}
                 </div>
-              </div>
-            ))}
-          </div>
+              )}
+            </Route>
+            <Route path="/favourites">
+              <Favourites
+                itemIds={favourites}
+                toggleFavourite={this.toggleFavourite}
+              />
+            </Route>
+          </Switch>
         </div>
       </div>
     );
