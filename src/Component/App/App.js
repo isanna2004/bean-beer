@@ -6,6 +6,8 @@ import BeerItem from "../BeerItem/BeerItem";
 import Favourites from "../Favourites/Favourites";
 import { Api } from "../../Api/Api";
 import { Route } from "react-router-dom/cjs/react-router-dom.min";
+import connect from "react-redux/lib/connect/connect";
+import {setBeersList} from "../../store/beers/actions"
 const api = new Api();
 
 class App extends React.Component {
@@ -26,13 +28,15 @@ class App extends React.Component {
 
   componentDidMount() {
     //получаем данные с api
-    this.setState({ loading: true });
-    api.getBeersList().then((data) =>
+    this.setState({ loading: true })
+
+    api.getBeersList().then(data =>{
       this.setState({
-        beersList: data,
         loading: false,
       })
-    );
+       this.props.setBeersList(data)
+  })
+   
   }
   /**
    * Methods
@@ -74,15 +78,15 @@ class App extends React.Component {
   render() {
     const {
       favourites,
-      beersList,
       searchedBeersList,
       loading,
       search,
     } = this.state;
+    const {beersList} = this.props
     const beers = searchedBeersList.length ? searchedBeersList : beersList;
     return (
       <div>
-        <Header favourites={favourites} />
+        <Header/>
 
         <div className="container">
           {/**
@@ -139,8 +143,11 @@ class App extends React.Component {
             </Route>
             <Route path="/favourites">
               <Favourites
+               
                 itemIds={favourites}
                 toggleFavourite={this.toggleFavourite}
+
+                
               />
             </Route>
           </Switch>
@@ -149,4 +156,9 @@ class App extends React.Component {
     );
   }
 }
-export default App;
+export default connect(({beers,favourites})=>({
+  ...beers,
+  favourites:favourites
+}),{
+  setBeersList
+})(App);

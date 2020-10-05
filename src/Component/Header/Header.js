@@ -1,18 +1,8 @@
 import React from "react";
-import { BrowserRouter as Router, Route, Switch, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 import "./Header.css";
 
-import App from "../App/App";
 class Header extends React.Component {
-  /*  fetch(` https://api.punkapi.com/v2/beers/?ids=${favourites.join("|")}`)
-      .then((res) => res.json())
-      .then((result) => {
-        this.setState({
-          isShown: true,
-          result: result,
-        });
-      }); */
-
   render() {
     return (
       <div className="header">

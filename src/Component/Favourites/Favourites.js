@@ -1,8 +1,8 @@
 import React from "react";
 import "./Favourites.css";
-import {Api} from "../../Api/Api"
-import BeerItem from "../BeerItem/BeerItem"
-const api = new Api()
+import { Api } from "../../Api/Api";
+import BeerItem from "../BeerItem/BeerItem";
+const api = new Api();
 export default class Favourites extends React.Component {
   /**
    * State
@@ -10,7 +10,6 @@ export default class Favourites extends React.Component {
   state = {
     loading: false,
     beersList: [],
-    
   };
 
   /**
@@ -20,20 +19,31 @@ export default class Favourites extends React.Component {
   componentDidMount() {
     //получаем данные с api
     this.setState({ loading: true });
-    api.getBeersList({ids:this.props.itemIds.join('|')}).then((data) =>
+    api.getBeersList({ ids: this.props.itemIds.join("|") }).then((data) =>
       this.setState({
         beersList: data,
         loading: false,
       })
     );
   }
+componentDidUpdate(prevProps) {
+ if (this.props.itemIds !== prevProps.itemIds) {
+    api.getBeersList({ ids: this.props.itemIds.join("|") }).then((data) =>
+      this.setState({
+        beersList: data,
+        loading: false,
+      })
+    );
+  }
+}
 
   /**
    * Render
    */
   render() {
-    const{loading,beersList}=this.state
-    const{itemIds}= this.props
+    const { loading, beersList } = this.state;
+    const { itemIds } = this.props;
+
     return loading ? (
       <p>is Loading</p>
     ) : (
@@ -44,10 +54,12 @@ export default class Favourites extends React.Component {
             beerData={beerData}
             isFavourite={itemIds.indexOf(beerData.id) !== -1}
             toggleFavourite={() => this.props.toggleFavourite(beerData.id)}
+
           />
-        ))}
+        ))
+        }
+  
       </div>
     );
-  
-}
+  }
 }
