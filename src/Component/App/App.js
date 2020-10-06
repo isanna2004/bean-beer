@@ -6,8 +6,11 @@ import BeerItem from "../BeerItem/BeerItem";
 import Favourites from "../Favourites/Favourites";
 import { Api } from "../../Api/Api";
 import { Route } from "react-router-dom/cjs/react-router-dom.min";
-import connect from "react-redux/lib/connect/connect";
-import {setBeersList} from "../../store/beers/actions"
+import { connect } from "react-redux";
+import { loadBeersList } from "../../store/beers/actions";
+import { setSearchedBeersList } from "../../store/beers/actions";
+import { loadSearchedBeersList } from "../../store/beers/actions";
+import { toggleFavorite } from "../../store/favourites/actions";
 const api = new Api();
 
 class App extends React.Component {
@@ -16,10 +19,8 @@ class App extends React.Component {
    */
   state = {
     loading: false,
-    beersList: [],
+
     search: "",
-    searchedBeersList: [],
-    favourites: [],
   };
 
   /**
@@ -28,65 +29,40 @@ class App extends React.Component {
 
   componentDidMount() {
     //получаем данные с api
-    this.setState({ loading: true })
-
-    api.getBeersList().then(data =>{
-      this.setState({
+    this.setState({ loading: true });
+this.props.loadBeersList().then(()=> this.setState({
         loading: false,
       })
-       this.props.setBeersList(data)
-  })
-   
+)
+    
   }
   /**
    * Methods
    */
   handleSearch = (e) => {
     e.preventDefault();
-    this.setState({ loading: true });
-    api
-      .getBeersList({
-        beer_name: this.state.search.toLowerCase().replace(" ", "_"),
-      })
-      .then((data) => {
-        this.setState({
-          searchedBeersList: data,
-          loading: false,
-        });
-      });
+  this.props.loadSearchedBeersList({
+    beer_name:this.state.search
+    .toLowerCase()
+    .replace(' ','_')
+  }).then(()=> this.setState({
+        loading: false,
+      }),
+  )
   };
-  toggleFavourite = (id) => {
-    this.setState((state) => {
-      const idx = state.favourites.indexOf(id);
-      return {
-        favourites:
-          idx === -1
-            ? [...state.favourites, id]
-            : [
-                ...state.favourites.slice(0, idx),
-                ...state.favourites.slice(idx + 1),
-              ],
-      };
-    });
 
-  };
 
   /**
    * Render
    */
 
   render() {
-    const {
-      favourites,
-      searchedBeersList,
-      loading,
-      search,
-    } = this.state;
-    const {beersList} = this.props
+    const {loading, search } = this.state;
+    const { beersList, searchedBeersList, favourites } = this.props;
     const beers = searchedBeersList.length ? searchedBeersList : beersList;
     return (
       <div>
-        <Header/>
+        <Header />
 
         <div className="container">
           {/**
@@ -107,12 +83,11 @@ class App extends React.Component {
                     placeholder="Search for beer..."
                     onChange={(e) => {
                       const val = e.target.value;
-                      this.setState((state) => ({
+                      this.setState((props) => ({
                         search: val,
-                        searchedBeersList: !val.trim()
-                          ? []
-                          : state.searchedBeersList,
+                        
                       }));
+                      if (!val.trim()) this.props.setSearchedBeersList([])
                     }}
                   />
                   <input
@@ -135,7 +110,7 @@ class App extends React.Component {
                       key={beerData.id}
                       beerData={beerData}
                       isFavourite={favourites.indexOf(beerData.id) !== -1}
-                      toggleFavourite={this.toggleFavourite}
+                      toggleFavourite={this.props.toggleFavorite}
                     />
                   ))}
                 </div>
@@ -143,11 +118,8 @@ class App extends React.Component {
             </Route>
             <Route path="/favourites">
               <Favourites
-               
                 itemIds={favourites}
-                toggleFavourite={this.toggleFavourite}
-
-                
+              
               />
             </Route>
           </Switch>
@@ -156,9 +128,16 @@ class App extends React.Component {
     );
   }
 }
-export default connect(({beers,favourites})=>({
-  ...beers,
-  favourites:favourites
-}),{
-  setBeersList
-})(App);
+export default connect(
+  ({ beers, favourites }) => ({
+    ...beers,
+    favourites: favourites,
+  }),
+  {
+
+    setSearchedBeersList,
+    loadSearchedBeersList,
+    toggleFavorite,
+    loadBeersList,
+  }
+)(App);

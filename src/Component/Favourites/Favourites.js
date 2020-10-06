@@ -2,8 +2,10 @@ import React from "react";
 import "./Favourites.css";
 import { Api } from "../../Api/Api";
 import BeerItem from "../BeerItem/BeerItem";
+import { connect } from "react-redux";
+import { toggleFavorite } from "../../store/favourites/actions";
 const api = new Api();
-export default class Favourites extends React.Component {
+class Favourites extends React.Component {
   /**
    * State
    */
@@ -26,16 +28,6 @@ export default class Favourites extends React.Component {
       })
     );
   }
-componentDidUpdate(prevProps) {
- if (this.props.itemIds !== prevProps.itemIds) {
-    api.getBeersList({ ids: this.props.itemIds.join("|") }).then((data) =>
-      this.setState({
-        beersList: data,
-        loading: false,
-      })
-    );
-  }
-}
 
   /**
    * Render
@@ -48,18 +40,20 @@ componentDidUpdate(prevProps) {
       <p>is Loading</p>
     ) : (
       <div className="row">
-        {beersList.map((beerData) => (
-          <BeerItem
-            key={beerData.id}
-            beerData={beerData}
-            isFavourite={itemIds.indexOf(beerData.id) !== -1}
-            toggleFavourite={() => this.props.toggleFavourite(beerData.id)}
-
-          />
-        ))
-        }
-  
+        {beersList
+          .filter((beerData) => itemIds.indexOf(beerData.id) !== -1)
+          .map((beerData) => (
+            <BeerItem
+              key={beerData.id}
+              beerData={beerData}
+              isFavourite={itemIds.indexOf(beerData.id) !== -1}
+              toggleFavourite={this.props.toggleFavorite}
+            />
+          ))}
       </div>
     );
   }
 }
+export default connect(({ favourites }) => ({ favourites }), {
+  toggleFavorite,
+})(Favourites);
